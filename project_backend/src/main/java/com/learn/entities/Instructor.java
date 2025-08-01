@@ -14,6 +14,8 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -40,6 +42,8 @@ public class Instructor
     @OneToOne
     @MapsId
     @JoinColumn(name = "user_id")
+
+    @NotNull(message = "User reference cannot be null")
     private User user;
 
     @OneToMany(mappedBy = "instructor" , cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)

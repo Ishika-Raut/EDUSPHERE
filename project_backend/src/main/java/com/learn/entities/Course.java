@@ -13,6 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,24 +32,36 @@ public class Course
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-    private String description;
-    private double price;
-    private String category;
-    private String thumbnailUrl;
+	    @NotBlank(message = "Course title is required")
+	    @Size(min = 2, max = 100, message = "Course title must be between 2 and 100 characters")
+	    private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "instructor_id", nullable = false)
-    private Instructor instructor;
+	    @NotBlank(message = "Course description is required")
+	    @Size(min = 10, max = 1000, message = "Description must be between 10 and 1000 characters")
+	    private String description;
 
-    @OneToMany(mappedBy = "course" , cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Video> videos = new ArrayList<>();
-   
-    @OneToMany(mappedBy = "course",cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<CartItem> cartItems = new ArrayList<>();
+	    @PositiveOrZero(message = "Price must be zero or positive")
+	    private double price;
 
-    @OneToMany(mappedBy = "course" ,cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)  
-    private List<Review> reviews = new ArrayList<>();
-    
-    
+	    @NotBlank(message = "Category is required")
+	    private String category;
+
+	    @NotBlank(message = "Thumbnail URL is required")
+	    @Size(max = 500, message = "Thumbnail URL is too long")
+	    private String thumbnailUrl;
+
+	    @ManyToOne
+	    @JoinColumn(name = "instructor_id", nullable = false)
+	    @NotNull(message = "Instructor is required for a course")
+	    private Instructor instructor;
+
+	    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	    private List<Video> videos = new ArrayList<>();
+
+	    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	    private List<CartItem> cartItems = new ArrayList<>();
+
+	    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	    private List<Review> reviews = new ArrayList<>();
 }
+
