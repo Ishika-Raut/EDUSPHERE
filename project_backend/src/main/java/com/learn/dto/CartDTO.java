@@ -6,8 +6,8 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class CartDTO 
-{
+public class CartDTO {
+
 	private Long id;
 	private Long learnerId;
 	private List<CartItemDTO> items = new ArrayList<>();

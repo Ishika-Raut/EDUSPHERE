@@ -19,10 +19,12 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CartController 
 {
+
 	private final CartService cartService;
 
 	
 	@PostMapping("/{learnerId}/add/{courseId}")
+
 	@PreAuthorize("hasRole('LEARNER')")
 	public ResponseEntity<CartDTO> addCourse(@PathVariable Long learnerId,@PathVariable Long courseId){
 		return ResponseEntity.ok(cartService.addCourseToCart(learnerId,courseId));
@@ -36,6 +38,7 @@ public class CartController
 	
 	@GetMapping("/{learnerId}")
 	@PreAuthorize("hasRole('LEARNER')")
+
 	public ResponseEntity<CartDTO> viewCart(@PathVariable Long learnerId){
 		return ResponseEntity.ok(cartService.getCartByLearner(learnerId));
 	}

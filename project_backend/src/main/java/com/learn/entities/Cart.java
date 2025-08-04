@@ -2,7 +2,6 @@ package com.learn.entities;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -48,8 +47,22 @@ public class Cart
     )
     private List<Course> courses = new ArrayList<>();
 	
-	public double getTotalPrice() 
-	{
+	
+	 public Cart(List<Course> courses, Learner learner,List<CartItem> items) {
+		 this.courses = courses;
+		 this.learner = learner;
+		 this.items = items;
+	 }
+
+	 public void addItem(CartItem item) {
+		 this.items.add(item);
+	 }
+	 
+	 public void removeItem(CartItem item) {
+		 this.items.remove(item);
+	 }
+	 
+	 public double getTotalPrice() {
 		 return items.stream()
 				 .mapToDouble(ci -> ci.getCourse().getPrice())
 				 .sum();
@@ -60,8 +73,4 @@ public class Cart
 		
 	 }
 
-	public Cart(Object object, Learner learnerobj, ArrayList arrayList) 
-	{
-		// TODO Auto-generated constructor stub
-	}
 }

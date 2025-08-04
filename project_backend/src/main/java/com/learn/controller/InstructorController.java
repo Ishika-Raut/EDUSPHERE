@@ -32,6 +32,7 @@ public class InstructorController {
 	
 	private final CourseService courseService;
 
+
 	
 	@PostMapping("/{id}/courses")
 	@PreAuthorize("hasRole('INSTRUCTOR')")
@@ -42,6 +43,7 @@ public class InstructorController {
 	}
 	
 	@PutMapping("/courses/{courseId}")
+
 	@PreAuthorize("hasRole('INSTRUCTOR')")
 	public ResponseEntity<CourseDTO> updateCourse(@PathVariable Long courseId , @RequestBody CourseDTO dto){
 		Course updated = instructorService.updateCourse(courseId,dto);
@@ -50,6 +52,7 @@ public class InstructorController {
 	}
 	
 	@GetMapping("{id}/courses")
+
 	@PreAuthorize("hasAuthority('INSTRUCTOR') or hasAuthority('ADMIN')")
 	public ResponseEntity<List<CourseDTO>> getAllCourseByInstructor(@PathVariable Long id){
 		List<Course> courses = instructorService.getAllCoursesByInstructor(id);
