@@ -26,6 +26,9 @@ public class Certificate
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "file_url")
+    private String fileUrl;
+    
     @ManyToOne
     @JoinColumn(name = "learner_id", nullable = false, unique = true)
     private Learner learner;

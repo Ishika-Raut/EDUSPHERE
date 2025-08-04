@@ -37,7 +37,7 @@ public class EnrollmentServiceImpl implements EnrollmentService
         Enrollment enrollment = new Enrollment();
         enrollment.setLearner(student);
         enrollment.setCourse(course);
-        enrollment.setEnrolledAt(dto.getEnrolledAt());
+        enrollment.setEnrolledDate(dto.getEnrolledAt());
         enrollment.setCompleted(dto.isCompleted());
 
         Enrollment saved = enrollmentRepository.save(enrollment);
@@ -70,7 +70,7 @@ public class EnrollmentServiceImpl implements EnrollmentService
 
         enrollment.setLearner(student);
         enrollment.setCourse(course);
-        enrollment.setEnrolledAt(dto.getEnrolledAt());
+        enrollment.setEnrolledDate(dto.getEnrolledAt());
         enrollment.setCompleted(dto.isCompleted());
 
         Enrollment updated = enrollmentRepository.save(enrollment);
@@ -91,8 +91,8 @@ public class EnrollmentServiceImpl implements EnrollmentService
         dto.setStudentName(enrollment.getLearner().getFullName());
         dto.setCourseId(enrollment.getCourse().getId());
         dto.setCourseTitle(enrollment.getCourse().getTitle());
-        dto.setEnrolledAt(enrollment.getEnrolledAt().toString());
-        dto.setCompleted(enrollment.isCompleted());
+        dto.setEnrolledAt(enrollment.getEnrolledDate().toString());
+        dto.setCompleted(enrollment.getCompleted());
         return dto;
     }
     

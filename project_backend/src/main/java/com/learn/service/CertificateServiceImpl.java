@@ -44,7 +44,7 @@ public class CertificateServiceImpl implements CertificateService {
 		Certificate cert = new Certificate();
 		cert.setLearner(learner);
 		cert.setCourse(course);
-		cert.setIssuedAt(LocalDateTime.now());
+		cert.setIssuedDate(LocalDateTime.now());
 		cert.setIssuedDate(LocalDateTime.now());
 		cert.setCertificateUrl("http://localhost:8080/api/certificates/download/" + learnerId + "/" + courseId);
 		
