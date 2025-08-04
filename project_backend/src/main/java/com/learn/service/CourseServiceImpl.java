@@ -10,14 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.learn.custom_exceptions.ApiException;
 import com.learn.custom_exceptions.ResourceNotFoundException;
 import com.learn.dto.ApiResponse;
-import com.learn.dto.CourseRequestDTO;
-import com.learn.dto.CourseResponseDTO;
+import com.learn.dto.CourseDTO;
 import com.learn.dto.CourseWithVideosResponseDTO;
-import com.learn.dto.VideoResponseDTO;
+import com.learn.dto.VideoDTO;
 import com.learn.entities.Course;
-import com.learn.entities.Video;
+import com.learn.entities.Instructor;
 import com.learn.repository.CourseRepository;
-import com.learn.repository.VideoRepository;
+import com.learn.repository.InstructorRepository;
 
 import lombok.AllArgsConstructor;
 
@@ -30,24 +29,10 @@ public class CourseServiceImpl implements CourseService
 	// depcy	
 	private final CourseRepository courseRepository;
 	private final ModelMapper modelMapper;
-
+	private InstructorRepository instructorRepository;
+	
 	@Override
-	public List<CourseResponseDTO> getAllCourses() 
-	{
-		List<Course> courses = courseRepository.findAll();	//List<Course>
-
-	    if (courses.isEmpty()) 
-	    {
-	        throw new ApiException("No courses found.");
-	    }
-		return courseRepository.findAll() //List<Course>
-				.stream() //Stream<Course>
-				.map(course -> modelMapper.map(course, CourseResponseDTO.class)) //Stream<dto>
-				.collect(Collectors.toList());//List<DTO>				
-	}
-		
-	@Override
-	public CourseResponseDTO addNewCourse(CourseRequestDTO dto) 
+	public CourseDTO addNewCourse(CourseDTO dto) 
 	{
 		/*
 		 * validate if the course name already exists 
@@ -60,31 +45,21 @@ public class CourseServiceImpl implements CourseService
 			//convert dto -> entity , for persistence
 			Course entity=modelMapper.map(dto,Course.class);
 			 return modelMapper.map(courseRepository.save(entity)
-					 , CourseResponseDTO.class);
+					 , CourseDTO.class);
 		}
-		throw new ApiException("Dup Course name !!!!!!");
-	} // when transactional method rets - tx over - tx .commit
-		// service layer rets DETACHED entity to the caller
-
+		throw new ApiException("Duplicate Course name !!!!!!");
+	} 
+	
 	@Override
-	public CourseResponseDTO getCourseDetailsById(Long id) 
-	{
-		// TODO Auto-generated method stub
-		Course entity = courseRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Invalid course ID"));
-		// entity -> dto
-		return modelMapper.map(entity, CourseResponseDTO.class);
-	}
-
-	@Override
-	public Course updateCourseDetails(Long id, CourseRequestDTO courseDTO) 
+	public CourseDTO updateCourseDetails(Long id, CourseDTO courseDTO) 
 	{
 		// validate restaurant id
 		Course course = courseRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Invalid course ID"));
 
 		// valid id -> continue to update
-		return courseRepository.save(course);
+		return modelMapper.map(courseRepository.save(course)
+				 , CourseDTO.class);
 	}// in case of success-> tx.commit -> DML : update -> sesison.close
 
 	@Override
@@ -97,21 +72,47 @@ public class CourseServiceImpl implements CourseService
 
 		return new ApiResponse("Course details deleted.....");
 	}
+	@Override
+	public CourseDTO getCourseDetailsById(Long id) 
+	{
+		// TODO Auto-generated method stub
+		Course entity = courseRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Invalid course ID"));
+		// entity -> dto
+		return modelMapper.map(entity, CourseDTO.class);
+	}
 
+	@Override
+	public List<CourseDTO> getAllCourses() 
+	{
+		List<Course> courses = courseRepository.findAll();	//List<Course>
+
+	    if (courses.isEmpty()) 
+	    {
+	        throw new ApiException("No courses found.");
+	    }
+		return courseRepository.findAll() //List<Course>
+				.stream() //Stream<Course>
+				.map(course -> modelMapper.map(course, CourseDTO.class)) //Stream<dto>
+				.collect(Collectors.toList());//List<DTO>				
+	}
 	
 	@Override
-	public CourseWithVideosResponseDTO getCourseWithVideos(String title) 
+	public CourseWithVideosResponseDTO getCourseDetailsWithVideos(String title) 
 	{
         Course course = courseRepository.findByTitle(title)
                 .orElseThrow(() -> new ApiException("Course not found with title: " + title));
 
         CourseWithVideosResponseDTO dto = new CourseWithVideosResponseDTO();
-        //dto.setCourseId(course.getId);
+        dto.setCourseId(course.getId());
         dto.setTitle(course.getTitle());
         dto.setDescription(course.getDescription());
+        dto.setPrice(course.getPrice());
+        dto.setCategory(course.getCategory());
+        dto.setThumbnailUrl(course.getThumbnailUrl());
 
-        List<VideoResponseDTO> videoDTOs = course.getVideos().stream()
-                .map(video -> modelMapper.map(video, VideoResponseDTO.class))
+        List<VideoDTO> videoDTOs = course.getVideos().stream()
+                .map(video -> modelMapper.map(video, VideoDTO.class))
                 .collect(Collectors.toList());
 
         dto.setVideos(videoDTOs);
@@ -123,20 +124,46 @@ public class CourseServiceImpl implements CourseService
 	{
 	    List<Course> courses = courseRepository.findAll();
 
+	    if (courses.isEmpty()) 
+	    {
+	        throw new ApiException("No courses found.");
+	    }
+	    
 	    return courses.stream().map(course -> {
 	        CourseWithVideosResponseDTO dto = new CourseWithVideosResponseDTO();
-	        //dto.setCourseId(course.getId());
+	        dto.setCourseId(course.getId());
 	        dto.setTitle(course.getTitle());
 	        dto.setDescription(course.getDescription());
+	        dto.setPrice(course.getPrice());
+	        dto.setCategory(course.getCategory());
+	        dto.setThumbnailUrl(course.getThumbnailUrl());
 
-	        List<VideoResponseDTO> videoDTOs = course.getVideos().stream()
-	                .map(video -> modelMapper.map(video, VideoResponseDTO.class))
+	        List<VideoDTO> videoDTOs = course.getVideos().stream()
+	                .map(video -> modelMapper.map(video, VideoDTO.class))
 	                .collect(Collectors.toList());
 
 	        dto.setVideos(videoDTOs);
 	        return dto;
 	    }).collect(Collectors.toList());
 	}
-	// no exc -> commit -> DML - delete . session.close -> l1 cache -> TRANSIENT
 
+	@Override
+	public List<CourseDTO> getAllCoursesByInstructor(Long instructorId) {
+	    Instructor instructor = instructorRepository.findById(instructorId)
+	        .orElseThrow(() -> new RuntimeException("Instructor not found with id: " + instructorId));
+
+	    List<Course> courses = instructor.getCreatedCourses(); // assuming this returns List<Course>
+
+	    // Convert List<Course> to List<CourseDTO> using ModelMapper
+	    return courses.stream()
+	            .map(course -> modelMapper.map(course, CourseDTO.class))
+	            .collect(Collectors.toList());
+	}
+
+	/*
+	@Override
+    public VideoProgress getVideoProgress(Long learnerId, Long courseId) {
+        return videoProgressService.getProgressByCourse(learnerId, courseId);
+    }
+	*/
 }

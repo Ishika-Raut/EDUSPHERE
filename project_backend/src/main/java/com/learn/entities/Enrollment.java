@@ -2,34 +2,43 @@ package com.learn.entities;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
 @Table(name = "enrollment") 
 @NoArgsConstructor
 @AllArgsConstructor
-public class Enrollment {
-    @Id 
+@Getter
+@Setter
+public class Enrollment 
+{
+    
+	@Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private User student;
+    @JoinColumn(name = "learner_id", nullable = false, unique = true)
+    private User learner;
 
     @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false, unique = true)
     private Course course;
 
-    private LocalDateTime enrolledAt;
-    private boolean completed;
-}
+    @Column(name = "enrollment_date")
+    private LocalDateTime enrolledDate;
 
+    private Boolean completed = false;
+}

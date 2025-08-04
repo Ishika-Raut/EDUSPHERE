@@ -1,7 +1,5 @@
 package com.learn.entities;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,18 +16,18 @@ import lombok.NoArgsConstructor;
 @Table(name = "cart_items") 
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItem {
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    private Long id;
-	 
-	    @ManyToOne
-	    @JoinColumn(name = "cart_id")
-	    private Cart cart;
+public class CartItem
+{
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+ 
+    @ManyToOne
+    @JoinColumn(name = "cart_id", nullable = false, unique = true)
+    private Cart cart;
+    
+    @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false, unique = true)
+    private Course course;
 	    
-	    @ManyToOne
-	    @JoinColumn(name = "course_id")
-	    private Course course;
-	    
-
 }

@@ -9,18 +9,23 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
 @Table(name = "cart") 
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Cart 
 {
 	@Id
@@ -28,15 +33,24 @@ public class Cart
     private Long id;
 
 	@OneToOne
-	@JoinColumn(name="learner_id", nullable = false)
+    @JoinColumn(name = "learner_id", nullable = false, unique = true)
     private Learner learner;
-    
+
 
 	 @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	 @JoinColumn(name = "cart_id")
 	 private List<CartItem> items = new ArrayList<>();
 	 
-	 public Cart(Learner learner,List<CartItem> items) {
+	 @ManyToMany(fetch = FetchType.EAGER)
+	    @JoinTable(
+	        name = "cart_courses",
+	        joinColumns = @JoinColumn(name = "cart_id"),
+	        inverseJoinColumns = @JoinColumn(name = "course_id")
+	    )
+	    private List<Course> courses = new ArrayList<>();
+	 
+	 public Cart(Course course, Learner learner,List<CartItem> items) {
+		 this.courses = null;
 		 this.learner = learner;
 		 this.items = items;
 	 }
@@ -48,8 +62,11 @@ public class Cart
 	 public void removeItem(CartItem item) {
 		 this.items.remove(item);
 	 }
-	 
-	 public double getTotalPrice() {
+	
+   
+	
+	public double getTotalPrice() 
+	{
 		 return items.stream()
 				 .mapToDouble(ci -> ci.getCourse().getPrice())
 				 .sum();
@@ -59,4 +76,8 @@ public class Cart
 		// TODO Auto-generated method stub
 		
 	 }
+
+
+	
+
 }

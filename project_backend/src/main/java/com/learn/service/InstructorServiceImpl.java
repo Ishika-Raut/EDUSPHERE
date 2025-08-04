@@ -6,7 +6,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.learn.entities.*;
-import com.learn.dto.CourseResponseDTO;
+import com.learn.dto.CourseDTO;
 import com.learn.entities.Course;
 import com.learn.repository.CourseRepository;
 import com.learn.repository.InstructorRepository;
@@ -26,7 +26,7 @@ public class InstructorServiceImpl implements InstructorService {
 	private final ModelMapper modelMapper;
 	
 	@Override
-	public Course addCourse(Long instructorId, CourseResponseDTO dto) {
+	public Course addCourse(Long instructorId, CourseDTO dto) {
 		// TODO Auto-generated method stub
 		Instructor instructor = instructorRepository.findById(instructorId)
 				.orElseThrow(()-> new RuntimeException("Instructor not found"));
@@ -38,7 +38,8 @@ public class InstructorServiceImpl implements InstructorService {
 	}
 
 	@Override
-	public Course updateCourse(Long courseId, CourseResponseDTO dto) {
+	public Course updateCourse(Long courseId, CourseDTO dto) {
+
 		// TODO Auto-generated method stub
 		Course course = courseRepository.findById(courseId)
 				.orElseThrow(() -> new RuntimeException("Course not found"));

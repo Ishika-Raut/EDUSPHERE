@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,13 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.learn.dto.CourseResponseDTO;
+import com.learn.dto.CourseDTO;
 import com.learn.entities.Course;
 import com.learn.service.CourseService;
 import com.learn.service.InstructorService;
 
+
+import lombok.AllArgsConstructor;
+
 @RestController
 @RequestMapping("/instructor")
+@AllArgsConstructor
 public class InstructorController {
 	
 	private final InstructorService instructorService;
@@ -28,38 +33,41 @@ public class InstructorController {
 	
 	private final CourseService courseService;
 
-	public InstructorController(InstructorService instructorService, ModelMapper modelMapper,
-			CourseService courseService) {
-		super();
-		this.instructorService = instructorService;
-		this.modelMapper = modelMapper;
-		this.courseService = courseService;
-	}
+
+	
+	
 	
 	@PostMapping("/{id}/courses")
-	public ResponseEntity<CourseResponseDTO> addCourse(@PathVariable Long id, @RequestBody CourseResponseDTO dto){
+	@PreAuthorize("hasRole('INSTRUCTOR')")
+	public ResponseEntity<CourseDTO> addCourse(@PathVariable Long id, @RequestBody CourseDTO dto){
 		Course created = instructorService.addCourse(id,dto);
-		CourseResponseDTO responseDto = modelMapper.map(created, CourseResponseDTO.class);	
+		CourseDTO responseDto = modelMapper.map(created, CourseDTO.class);	
+
 		return ResponseEntity.ok(responseDto);
 	}
 	
 	@PutMapping("/courses/{courseId}")
-	public ResponseEntity<CourseResponseDTO> updateCourse(@PathVariable Long courseId , @RequestBody CourseResponseDTO dto){
+	@PreAuthorize("hasRole('INSTRUCTOR')")
+	public ResponseEntity<CourseDTO> updateCourse(@PathVariable Long courseId , @RequestBody CourseDTO dto){
 		Course updated = instructorService.updateCourse(courseId,dto);
-		CourseResponseDTO responseDto = modelMapper.map(updated, CourseResponseDTO.class);
+		CourseDTO responseDto = modelMapper.map(updated, CourseDTO.class);
+
 		return ResponseEntity.ok(responseDto);
 	}
 	
 	@GetMapping("{id}/courses")
-	public ResponseEntity<List<CourseResponseDTO>> getAllCourseByInstructor(@PathVariable Long id){
+	@PreAuthorize("hasAuthority('INSTRUCTOR') or hasAuthority('ADMIN')")
+	public ResponseEntity<List<CourseDTO>> getAllCourseByInstructor(@PathVariable Long id){
 		List<Course> courses = instructorService.getAllCoursesByInstructor(id);
-		List<CourseResponseDTO> dtos = courses.stream()
-				.map(course -> modelMapper.map(course, CourseResponseDTO.class))
+		List<CourseDTO> dtos = courses.stream()
+				.map(course -> modelMapper.map(course, CourseDTO.class))
+
 				.toList();
 		return ResponseEntity.ok(dtos);
 	}
 	
 	@DeleteMapping("/courses/{courseId}")
+	@PreAuthorize("hasRole('INSTRUCTOR')")
 	public ResponseEntity<String> deleteCourse(@PathVariable Long courseId) {
 	    instructorService.deleteCourse(courseId);
 	    return ResponseEntity.ok("Course deleted successfully");
