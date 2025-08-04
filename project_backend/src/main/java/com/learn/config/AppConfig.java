@@ -21,16 +21,5 @@ public class AppConfig {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
-    
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() // 👈 Allow all endpoints publicly
-            );
-        return http.build();
-    }
-
 
 }

@@ -3,6 +3,7 @@ package com.learn.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,12 +23,15 @@ import com.learn.dto.UserUpdateResponseDTO;
 import com.learn.service.UserService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/users")
 @AllArgsConstructor
+@Validated
 public class UserController {
 
 	private final UserService userService;
@@ -57,12 +61,12 @@ public class UserController {
 	}
 	
 	@GetMapping("/getuserbyid/{id}")
-	public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id){
+	public ResponseEntity<UserResponseDTO> getUserById(@PathVariable @NotNull @Min(1) Long id){
 		return ResponseEntity.ok(userService.getUserById(id));
 	}
 	
 	@PutMapping("/updatebyid/{id}")
-	public ResponseEntity<UserUpdateResponseDTO> updateUser(@PathVariable Long id,@Valid @RequestBody UserUpdateDTO dto){
+	public ResponseEntity<UserUpdateResponseDTO> updateUser(@PathVariable @NotNull @Min(1) Long id,@Valid @RequestBody UserUpdateDTO dto){
 		return ResponseEntity.ok(userService.updateUser(id,dto));
 	}
 	
